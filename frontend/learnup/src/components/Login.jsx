@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signup } from '../services/api';
+import { login } from '../services/api';
 import Navbar from './Navbar';
-import './Signup.css';
+import './Login.css';
 
-function Signup() {
+function Login() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         email: '',
         password: '',
-        confirmPassword: '',
     });
     const [errors, setErrors] = useState({});
     const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +16,6 @@ function Signup() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        console.log(name, value);
         setFormData((prev) => ({
             ...prev,
             [name]: value,
@@ -44,15 +42,6 @@ function Signup() {
         // Password validation
         if (!formData.password) {
             newErrors.password = 'Password is required';
-        } else if (formData.password.length < 8) {
-            newErrors.password = 'Password must be at least 8 characters long';
-        }
-
-        // Confirm password validation
-        if (!formData.confirmPassword) {
-            newErrors.confirmPassword = 'Please confirm your password';
-        } else if (formData.password !== formData.confirmPassword) {
-            newErrors.confirmPassword = 'Passwords do not match';
         }
 
         setErrors(newErrors);
@@ -70,17 +59,17 @@ function Signup() {
         setIsLoading(true);
 
         try {
-            const response = await signup(formData.email, formData.password);
+            const response = await login(formData.email, formData.password);
 
             // Redirect to homepage with success message
             navigate('/', {
                 state: {
-                    message: `Welcome, ${response.user.username}! Your account has been created successfully. 🎉`
+                    message: `Welcome back, ${response.user.username}! 🎉`
                 }
             });
         } catch (error) {
             setErrors({
-                submit: error.message || 'An error occurred during signup. Please try again.',
+                submit: error.message || 'An error occurred during login. Please try again.',
             });
         } finally {
             setIsLoading(false);
@@ -90,14 +79,14 @@ function Signup() {
     return (
         <>
             <Navbar />
-            <div className="signup-container">
-                <div className="signup-card">
-                    <div className="signup-header">
-                        <h1 className="signup-title">Create Account</h1>
-                        <p className="signup-subtitle">Join LearnUp and start your learning journey</p>
+            <div className="login-container">
+                <div className="login-card">
+                    <div className="login-header">
+                        <h1 className="login-title">Welcome Back</h1>
+                        <p className="login-subtitle">Sign in to continue your learning journey</p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="signup-form">
+                    <form onSubmit={handleSubmit} className="login-form">
                         {/* Email Field */}
                         <div className="form-group">
                             <label htmlFor="email" className="form-label">
@@ -128,30 +117,17 @@ function Signup() {
                                 value={formData.password}
                                 onChange={handleChange}
                                 className={`form-input ${errors.password ? 'input-error' : ''}`}
-                                placeholder="At least 8 characters"
+                                placeholder="Enter your password"
                                 disabled={isLoading}
                             />
                             {errors.password && <p className="error-message">{errors.password}</p>}
                         </div>
 
-                        {/* Confirm Password Field */}
-                        <div className="form-group">
-                            <label htmlFor="confirmPassword" className="form-label">
-                                Confirm Password
-                            </label>
-                            <input
-                                type="password"
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                className={`form-input ${errors.confirmPassword ? 'input-error' : ''}`}
-                                placeholder="Re-enter your password"
-                                disabled={isLoading}
-                            />
-                            {errors.confirmPassword && (
-                                <p className="error-message">{errors.confirmPassword}</p>
-                            )}
+                        {/* Forgot Password Link */}
+                        <div className="forgot-password-container">
+                            <a href="#" className="forgot-password-link">
+                                Forgot password?
+                            </a>
                         </div>
 
                         {/* Submit Error */}
@@ -179,19 +155,19 @@ function Signup() {
                             {isLoading ? (
                                 <>
                                     <span className="spinner"></span>
-                                    Creating Account...
+                                    Signing In...
                                 </>
                             ) : (
-                                'Sign Up'
+                                'Sign In'
                             )}
                         </button>
                     </form>
 
-                    <div className="signup-footer">
+                    <div className="login-footer">
                         <p className="footer-text">
-                            Already have an account?{' '}
-                            <Link to="/login" className="footer-link">
-                                Sign in
+                            Don't have an account?{' '}
+                            <Link to="/signup" className="footer-link">
+                                Sign up
                             </Link>
                         </p>
                     </div>
@@ -201,4 +177,4 @@ function Signup() {
     );
 }
 
-export default Signup;
+export default Login;

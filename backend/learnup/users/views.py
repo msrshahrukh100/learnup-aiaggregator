@@ -4,7 +4,13 @@ from django.contrib.auth import authenticate, login as auth_login
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-import json
+from .utils import (
+    parse_json_request,
+    validate_credentials,
+    error_response,
+    user_response_data,
+    generate_unique_username
+)
 
 
 @csrf_exempt
@@ -25,81 +31,95 @@ def signup(request):
     - 409: User already exists
     """
     try:
-        # Parse JSON request body
-        data = json.loads(request.body)
+        # Parse request
+        data, error = parse_json_request(request)
+        if error:
+            return error
         
-        # Extract fields
+        # Extract and validate credentials
         email = data.get('email', '').strip()
         password = data.get('password', '')
         
-        # Validation
-        if not email:
-            return JsonResponse({
-                'success': False,
-                'error': 'Email is required'
-            }, status=400)
-        
-        if not password:
-            return JsonResponse({
-                'success': False,
-                'error': 'Password is required'
-            }, status=400)
-        
-        if len(password) < 8:
-            return JsonResponse({
-                'success': False,
-                'error': 'Password must be at least 8 characters long'
-            }, status=400)
+        is_valid, error = validate_credentials(email, password, check_password_length=True)
+        if not is_valid:
+            return error
         
         # Check if user already exists
         if User.objects.filter(email=email).exists():
-            return JsonResponse({
-                'success': False,
-                'error': 'A user with this email already exists'
-            }, status=409)
-        
-        # Generate unique username from email
-        base_username = email.split('@')[0]
-        username = base_username
-        counter = 1
-        
-        # Handle username conflicts by appending numbers
-        while User.objects.filter(username=username).exists():
-            username = f"{base_username}{counter}"
-            counter += 1
+            return error_response('A user with this email already exists', status=409)
         
         # Create user
+        username = generate_unique_username(email)
         user = User.objects.create_user(
             username=username,
             email=email,
             password=password
         )
         
-        # Optionally auto-login the user after signup
+        # Auto-login after signup
         auth_login(request, user)
         
         return JsonResponse({
             'success': True,
             'message': 'User created successfully',
-            'user': {
-                'id': user.id,
-                'username': user.username,
-                'email': user.email
-            }
+            'user': user_response_data(user)
         }, status=201)
         
-    except json.JSONDecodeError:
-        return JsonResponse({
-            'success': False,
-            'error': 'Invalid JSON format'
-        }, status=400)
-    
     except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': f'An error occurred: {str(e)}'
-        }, status=500)
+        return error_response(f'An error occurred: {str(e)}')
 
 
+@csrf_exempt
+@require_http_methods(["POST"])
 def login(request):
-    pass
+    """
+    Handle user login with email and password.
+    
+    Expected JSON payload:
+    {
+        "email": "user@example.com",
+        "password": "securepassword"
+    }
+    
+    Returns:
+    - 200: Login successful
+    - 400: Invalid input or validation errors
+    - 401: Invalid credentials
+    """
+    try:
+        # Parse request
+        data, error = parse_json_request(request)
+        if error:
+            return error
+        
+        # Extract and validate credentials
+        email = data.get('email', '').strip()
+        password = data.get('password', '')
+        
+        is_valid, error = validate_credentials(email, password)
+        if not is_valid:
+            return error
+        
+        # Find user by email
+        try:
+            user_obj = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return error_response('Invalid email or password', status=401)
+        
+        # Authenticate user
+        user = authenticate(request, username=user_obj.username, password=password)
+        
+        if user is None:
+            return error_response('Invalid email or password', status=401)
+        
+        # Login the user (creates session)
+        auth_login(request, user)
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Login successful',
+            'user': user_response_data(user)
+        }, status=200)
+        
+    except Exception as e:
+        return error_response(f'An error occurred: {str(e)}')

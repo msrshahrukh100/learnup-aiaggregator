@@ -8,12 +8,15 @@ from .llmprovider.factory import LLMFactory
 
 @csrf_exempt
 @require_POST
-# @login_required  # Uncomment if authentication is required
 def chat_view(request):
     """
     Main endpoint for chat interactions.
-    Expects JSON: { "message": "...", "model_name": "...", "chat_id": "..." }
+    Requires authentication.
+    Expects JSON: { "message": "...", "model_name": "...", "chat_id": "..." (optional) }
     """
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+
     try:
         data = json.loads(request.body)
         user_message = data.get('message')
@@ -26,22 +29,14 @@ def chat_view(request):
         # Retrieve or create the chat session
         if chat_id:
             try:
-                chat = Chat.objects.get(id=chat_id)
+                # Ensure the chat exists and belongs to the authenticated user
+                chat = Chat.objects.get(id=chat_id, user=request.user)
             except Chat.DoesNotExist:
-                return JsonResponse({'error': f'Chat with id {chat_id} not found'}, status=404)
+                return JsonResponse({'error': f'Chat with id {chat_id} not found or access denied'}, status=404)
         else:
-            # Create a new chat session
-            from django.contrib.auth.models import User
-            # Try to get the authenticated user, or fall back to the first available user for testing
-            user = request.user if request.user.is_authenticated else User.objects.first()
-            
-            # Ensure we have at least one user in the system
-            if not user:
-                user = User.objects.create_user(username='default_user')
-            
-            # Set initial title from the message
+            # Create a new chat session for the authenticated user
             title = user_message[:50] + "..." if len(user_message) > 50 else user_message
-            chat = Chat.objects.create(user=user, title=title)
+            chat = Chat.objects.create(user=request.user, title=title)
             chat_id = chat.id
         
         # 1. Save user message to database

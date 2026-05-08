@@ -1,7 +1,38 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { getCurrentUser, logout } from '../services/api';
 import './Navbar.css';
 
 function Navbar() {
+    const navigate = useNavigate();
+    const [user, setUser] = useState(null);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const data = await getCurrentUser();
+                if (data.success) {
+                    setUser(data.user);
+                }
+            } catch (error) {
+                // Not logged in or error, keep user as null
+                console.log('User not logged in');
+            }
+        };
+
+        fetchUser();
+    }, []);
+
+    const handleLogout = async () => {
+        try {
+            await logout();
+            setUser(null);
+            navigate('/login');
+        } catch (error) {
+            console.error('Logout failed:', error);
+        }
+    };
+
     return (
         <nav className="navbar">
             <div className="navbar-container">
@@ -42,14 +73,30 @@ function Navbar() {
                     <span className="brand-name">Learnup</span>
                 </Link>
 
-                {/* Navigation Buttons */}
+                {/* Navigation Buttons or User Profile */}
                 <div className="navbar-actions">
-                    <Link to="/login" className="nav-button login-button">
-                        Login
-                    </Link>
-                    <Link to="/signup" className="nav-button signup-button">
-                        Sign Up
-                    </Link>
+                    {user ? (
+                        <>
+                            <div className="user-profile">
+                                <span className="user-name">Hi, {user.username}</span>
+                                <div className="user-avatar">
+                                    {user.username.charAt(0).toUpperCase()}
+                                </div>
+                            </div>
+                            <button onClick={handleLogout} className="nav-button logout-button">
+                                Logout
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <Link to="/login" className="nav-button login-button">
+                                Login
+                            </Link>
+                            <Link to="/signup" className="nav-button signup-button">
+                                Sign Up
+                            </Link>
+                        </>
+                    )}
                 </div>
             </div>
         </nav>

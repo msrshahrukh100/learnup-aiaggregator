@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../services/api';
-import Navbar from './Navbar';
 import './Login.css';
 
 function Login() {
@@ -78,7 +77,6 @@ function Login() {
 
     return (
         <>
-            <Navbar />
             <div className="login-container">
                 <div className="login-card">
                     <div className="login-header">

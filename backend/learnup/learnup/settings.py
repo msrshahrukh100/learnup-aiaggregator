@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -127,3 +127,6 @@ CORS_ALLOWED_ORIGINS = [
 
 # Allow credentials (cookies, authorization headers, etc.)
 CORS_ALLOW_CREDENTIALS = True
+
+# LLM Provider Settings
+GEMINI_API_KEY = 'your-gemini-api-key-here'

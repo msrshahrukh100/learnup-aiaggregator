@@ -59,3 +59,49 @@ export const login = async (email, password) => {
         throw error;
     }
 };
+
+/**
+ * Get currently authenticated user
+ * @returns {Promise<Object>} User data
+ */
+export const getCurrentUser = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/me/`, {
+            method: 'GET',
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to fetch user');
+        }
+
+        return data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+/**
+ * Logout the current user
+ * @returns {Promise<Object>} Response data
+ */
+export const logout = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/users/logout/`, {
+            method: 'POST',
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Logout failed');
+        }
+
+        return data;
+    } catch (error) {
+        throw error;
+    }
+};

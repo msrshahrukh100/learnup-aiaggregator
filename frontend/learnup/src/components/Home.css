@@ -145,6 +145,22 @@
     line-height: 1.6;
 }
 
+.welcome-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 1rem 0;
+    line-height: 1.2;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.welcome-subtitle {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 2rem 0;
+    animation: fadeInUp 1s ease-out;
+}
+
 .hero-actions {
     display: flex;
     gap: 1rem;

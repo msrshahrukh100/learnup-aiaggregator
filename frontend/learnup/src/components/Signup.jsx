@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { signup } from '../services/api';
-import Navbar from './Navbar';
 import './Signup.css';
 
 function Signup() {
@@ -89,7 +88,6 @@ function Signup() {
 
     return (
         <>
-            <Navbar />
             <div className="signup-container">
                 <div className="signup-card">
                     <div className="signup-header">

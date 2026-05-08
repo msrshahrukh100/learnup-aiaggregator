@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -67,6 +67,34 @@ def signup(request):
         
     except Exception as e:
         return error_response(f'An error occurred: {str(e)}')
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+def me(request):
+    """
+    Get the currently logged-in user's data based on session.
+    """
+    if request.user.is_authenticated:
+        return JsonResponse({
+            'success': True,
+            'user': user_response_data(request.user)
+        })
+    else:
+        return error_response('Not authenticated', status=401)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def logout(request):
+    """
+    Handle user logout.
+    """
+    auth_logout(request)
+    return JsonResponse({
+        'success': True,
+        'message': 'Logged out successfully'
+    })
 
 
 @csrf_exempt

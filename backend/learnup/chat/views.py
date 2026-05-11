@@ -3,7 +3,8 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from .models import Chat, ChatMessage
+from django.db import transaction
+from .models import Chat, ChatMessage, UserTokenBalance, UserTokenTransaction
 from .llmprovider.factory import LLMFactory
 
 @csrf_exempt
@@ -25,6 +26,15 @@ def chat_view(request):
 
         if not user_message or not model_name:
             return JsonResponse({'error': 'Missing required fields: message, model_name'}, status=400)
+
+        # Check Token Balance
+        try:
+            token_balance = UserTokenBalance.objects.get(user=request.user)
+        except UserTokenBalance.DoesNotExist:
+            token_balance = UserTokenBalance.objects.create(user=request.user, balance=1000)
+            
+        if token_balance.balance <= 0:
+            return JsonResponse({'error': 'Insufficient tokens. Please top up your balance.'}, status=402)
 
         # Retrieve or create the chat session
         if chat_id:
@@ -52,16 +62,34 @@ def chat_view(request):
             return JsonResponse({'error': str(e)}, status=400)
 
         # 4. Generate response from LLM
-        assistant_response = provider.generate_response(messages, model_name=model_name)
+        llm_result = provider.generate_response(messages, model_name=model_name)
+        assistant_response = llm_result['response']
+        usage = llm_result['usage']
+        total_tokens = usage.get('total_tokens', 0)
 
-        # 5. Save assistant response to database
-        ChatMessage.objects.create(chat=chat, role='assistant', content=assistant_response)
+        with transaction.atomic():
+            # 5. Save assistant response to database
+            ChatMessage.objects.create(chat=chat, role='assistant', content=assistant_response)
+            
+            # 6. Deduct tokens
+            token_balance.balance -= total_tokens
+            token_balance.save()
+            
+            # 7. Record transaction
+            UserTokenTransaction.objects.create(
+                user=request.user,
+                amount=total_tokens,
+                transaction_type='usage',
+                description=f"Usage for chat: {chat.title} (Model: {model_name})"
+            )
 
         return JsonResponse({
             'response': assistant_response,
             'role': 'assistant',
             'chat_id': chat_id,
-            'chat_title': chat.title
+            'chat_title': chat.title,
+            'tokens_used': total_tokens,
+            'remaining_balance': float(token_balance.balance)
         })
 
     except json.JSONDecodeError:

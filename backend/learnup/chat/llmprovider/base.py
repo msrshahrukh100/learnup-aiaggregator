@@ -12,13 +12,13 @@ class BaseLLMProvider(ABC):
         messages: List[Dict[str, str]], 
         model_name: Optional[str] = None,
         **kwargs
-    ) -> str:
+    ) -> Dict[str, Any]:
         """
         Generate a response from the LLM provider.
         
         :param messages: List of message dictionaries with 'role' and 'content'.
         :param model_name: Optional name of the model to use.
         :param kwargs: Additional provider-specific parameters.
-        :return: Generated response string.
+        :return: A dictionary containing 'response' (str) and 'usage' (dict).
         """
         pass

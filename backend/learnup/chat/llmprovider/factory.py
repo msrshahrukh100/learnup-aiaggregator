@@ -31,8 +31,5 @@ class LLMFactory:
         Returns a list of supported model names.
         """
         return [
-            "gemini-2.0-flash",
-            "gemini-1.5-flash",
-            "gemini-1.5-pro",
             "gemini-3.1-flash-lite"
         ]

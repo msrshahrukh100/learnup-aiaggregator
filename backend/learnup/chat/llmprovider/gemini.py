@@ -32,7 +32,7 @@ class GeminiProvider(BaseLLMProvider):
         messages: List[Dict[str, str]], 
         model_name: str = "gemini-2.0-flash", 
         **kwargs
-    ) -> str:
+    ) -> Dict[str, Any]:
         """
         Generate a response using Gemini API (Synchronous).
         """
@@ -40,7 +40,7 @@ class GeminiProvider(BaseLLMProvider):
             raise ValueError("Gemini API key is not configured.")
             
         if not messages:
-            return ""
+            return {"response": "", "usage": {}}
         
         # Include up to the last 5 messages in the history
         history_window = messages[-6:-1]
@@ -49,4 +49,14 @@ class GeminiProvider(BaseLLMProvider):
         
         chat = self.client.chats.create(model=model_name, history=history)
         response = chat.send_message(prompt, config=kwargs.get("config"))
-        return response.text
+        
+        usage = {
+            "prompt_tokens": response.usage_metadata.prompt_token_count,
+            "candidates_tokens": response.usage_metadata.candidates_token_count,
+            "total_tokens": response.usage_metadata.total_token_count,
+        }
+        
+        return {
+            "response": response.text,
+            "usage": usage
+        }

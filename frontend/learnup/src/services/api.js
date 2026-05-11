@@ -158,3 +158,54 @@ export const sendMessage = async (message, modelName, chatId = null) => {
         throw error;
     }
 };
+
+/**
+ * Get all chats for the current user with pagination
+ * @param {number} limit - Number of chats to fetch
+ * @param {number} offset - Offset for pagination
+ * @returns {Promise<Object>} List of chats and pagination info
+ */
+export const getUserChats = async (limit = 10, offset = 0) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/chat/list/?limit=${limit}&offset=${offset}`, {
+            method: 'GET',
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to fetch chats');
+        }
+
+        return data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+
+/**
+ * Get messages for a specific chat
+ * @param {number} chatId - Chat ID
+ * @returns {Promise<Object>} List of messages
+ */
+export const getChatMessages = async (chatId) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/chat/${chatId}/messages/`, {
+            method: 'GET',
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to fetch messages');
+        }
+
+        return data;
+    } catch (error) {
+        throw error;
+    }
+};
+

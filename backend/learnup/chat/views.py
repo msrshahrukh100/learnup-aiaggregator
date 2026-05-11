@@ -80,3 +80,45 @@ def get_models_view(request):
         return JsonResponse({'models': models})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+@require_GET
+def get_chats_view(request):
+    """
+    Returns chats for the authenticated user with pagination.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    try:
+        limit = int(request.GET.get('limit', 10))
+        offset = int(request.GET.get('offset', 0))
+    except ValueError:
+        limit = 10
+        offset = 0
+    
+    queryset = Chat.objects.filter(user=request.user)
+    total_count = queryset.count()
+    chats = queryset.values('id', 'title', 'updated_at')[offset:offset+limit]
+    
+    return JsonResponse({
+        'chats': list(chats),
+        'total_count': total_count,
+        'has_more': offset + limit < total_count
+    })
+
+
+@require_GET
+def get_chat_messages_view(request, chat_id):
+    """
+    Returns all messages for a specific chat.
+    """
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+    
+    try:
+        chat = Chat.objects.get(id=chat_id, user=request.user)
+        messages = chat.messages.all().values('role', 'content', 'created_at')
+        return JsonResponse({'messages': list(messages)})
+    except Chat.DoesNotExist:
+        return JsonResponse({'error': 'Chat not found'}, status=404)
+

@@ -1,11 +1,44 @@
 /* Home Page Styles */
 
-.home-container {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    position: relative;
-    overflow-x: hidden;
+.home-wrapper.with-sidebar {
+    display: flex;
+    background-color: #ffffff;
+    height: 100vh;
+    overflow: hidden;
 }
+
+
+.home-container {
+    flex: 1;
+    height: 100vh;
+    background-color: #ffffff;
+    position: relative;
+    overflow: hidden; /* Prevent page scroll */
+    transition: margin-left 0.3s ease;
+}
+
+
+.home-wrapper.with-sidebar .home-container {
+    margin-left: 280px;
+    padding-top: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+
+.home-wrapper:not(.with-sidebar) .home-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding-top: 80px;
+}
+
 
 /* Welcome Banner */
 .welcome-banner {
@@ -72,11 +105,11 @@
 
 /* Hero Section */
 .hero-section {
-    min-height: 100vh;
+    min-height: calc(100vh - 80px);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4rem 2rem;
+    padding: 2rem;
     position: relative;
     overflow: hidden;
 }

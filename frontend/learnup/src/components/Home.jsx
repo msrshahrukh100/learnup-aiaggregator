@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import ChatInterface from './ChatInterface';
+import HeroSection from './HeroSection';
+import Sidebar from './Sidebar';
 import { getCurrentUser } from '../services/api';
 import './Home.css';
 
 function Home() {
     const [user, setUser] = useState(null);
+    const [selectedChatId, setSelectedChatId] = useState(null);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -22,27 +25,32 @@ function Home() {
         fetchUser();
     }, []);
 
+    const handleChatSelect = (chatId) => {
+        setSelectedChatId(chatId);
+    };
+
     return (
-        <>
-            <Navbar />
+        <div className={`home-wrapper ${user ? 'with-sidebar' : ''}`}>
+            {!user && <Navbar />}
+            {user && <Sidebar user={user} onChatSelect={handleChatSelect} selectedChatId={selectedChatId} />}
             <div className="home-container">
-                <div className="hero-section">
-                    <h1 className="welcome-title">
-                        {user ? `Welcome back, ${user.username}!` : 'Welcome to Learnup'}
-                    </h1>
-                    <p className="welcome-subtitle">
-                        Your personalized learning journey continues here.
-                    </p>
-                </div>
-                
-                {user && (
+                {user ? (
                     <div className="chat-section">
-                        <ChatInterface />
+                        <ChatInterface 
+                            user={user} 
+                            chatId={selectedChatId} 
+                            onChatCreated={handleChatSelect}
+                            onNewChat={() => handleChatSelect(null)}
+                        />
                     </div>
+
+                ) : (
+                    <HeroSection user={user} />
                 )}
             </div>
-        </>
+        </div>
     );
 }
 
 export default Home;
+

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
+import ChatInterface from './ChatInterface';
 import { getCurrentUser } from '../services/api';
 import './Home.css';
 
@@ -33,6 +34,12 @@ function Home() {
                         Your personalized learning journey continues here.
                     </p>
                 </div>
+                
+                {user && (
+                    <div className="chat-section">
+                        <ChatInterface />
+                    </div>
+                )}
             </div>
         </>
     );

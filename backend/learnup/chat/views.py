@@ -1,6 +1,6 @@
 import json
 from django.http import JsonResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from .models import Chat, ChatMessage
@@ -66,5 +66,17 @@ def chat_view(request):
 
     except json.JSONDecodeError:
         return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+@require_GET
+def get_models_view(request):
+    """
+    Returns a list of available models.
+    """
+    try:
+        models = LLMFactory.get_available_models()
+        return JsonResponse({'models': models})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)

@@ -105,3 +105,56 @@ export const logout = async () => {
         throw error;
     }
 };
+
+/**
+ * Get available LLM models
+ * @returns {Promise<Object>} List of models
+ */
+export const getModels = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/chat/models/`, {
+            method: 'GET',
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to fetch models');
+        }
+
+        return data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+/**
+ * Send a message to the chat API
+ * @param {string} message - User's message
+ * @param {string} modelName - Selected model name
+ * @param {string} [chatId] - Optional chat session ID
+ * @returns {Promise<Object>} Response from the assistant
+ */
+export const sendMessage = async (message, modelName, chatId = null) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/chat/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message, model_name: modelName, chat_id: chatId }),
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to send message');
+        }
+
+        return data;
+    } catch (error) {
+        throw error;
+    }
+};

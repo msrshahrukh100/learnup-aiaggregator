@@ -25,3 +25,14 @@ class LLMFactory:
         #     return cls._provider_map["openai"]()
             
         raise ValueError(f"No LLM provider found for model: {model_name}")
+    @classmethod
+    def get_available_models(cls):
+        """
+        Returns a list of supported model names.
+        """
+        return [
+            "gemini-2.0-flash",
+            "gemini-1.5-flash",
+            "gemini-1.5-pro",
+            "gemini-3.1-flash-lite"
+        ]

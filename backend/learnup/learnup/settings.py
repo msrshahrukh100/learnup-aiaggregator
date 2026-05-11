@@ -129,4 +129,4 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 
 # LLM Provider Settings
-GEMINI_API_KEY = 'your-gemini-api-key-here'
+GEMINI_API_KEY = ''

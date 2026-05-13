@@ -1,6 +1,7 @@
 from typing import Dict, Type
 from .base import BaseLLMProvider
 from .gemini import GeminiProvider
+from .openai import OpenAIProvider
 
 class LLMFactory:
     """
@@ -8,7 +9,7 @@ class LLMFactory:
     """
     _provider_map: Dict[str, Type[BaseLLMProvider]] = {
         "gemini": GeminiProvider,
-        # "openai": OpenAIProvider,  # Add other providers here later
+        "openai": OpenAIProvider,
     }
 
     @classmethod
@@ -20,9 +21,8 @@ class LLMFactory:
         
         if model_name.startswith("gemini"):
             return cls._provider_map["gemini"]()
-        # Example for OpenAI later:
-        # elif model_name.startswith("gpt"):
-        #     return cls._provider_map["openai"]()
+        elif model_name.startswith("gpt"):
+            return cls._provider_map["openai"]()
             
         raise ValueError(f"No LLM provider found for model: {model_name}")
     @classmethod
@@ -31,5 +31,7 @@ class LLMFactory:
         Returns a list of supported model names.
         """
         return [
-            "gemini-3.1-flash-lite"
+            "gemini-3.1-flash-lite",
+            "gpt-4o-mini",
+            "gpt-4o"
         ]

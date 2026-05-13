@@ -54,28 +54,37 @@
 }
 
 /* Welcome State */
-.welcome-container {
+.chat-welcome-container {
     flex: 1;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
 }
 
-.welcome-content {
+.chat-welcome-content {
     max-width: 600px;
+    animation: fadeIn 0.8s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.welcome-heading {
+.chat-welcome-heading {
     font-size: 3rem;
     font-weight: 800;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     color: #111827;
 }
 
-.welcome-subtext {
+.chat-welcome-subtext {
     font-size: 1.125rem;
     color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.chat-welcome-subtext:last-child {
     margin-bottom: 3rem;
 }
 

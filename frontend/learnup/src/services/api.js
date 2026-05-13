@@ -209,3 +209,81 @@ export const getChatMessages = async (chatId) => {
     }
 };
 
+/**
+ * Get available products
+ * @returns {Promise<Object>} List of products
+ */
+export const getProducts = async () => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/payments/products/`, {
+            method: 'GET',
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to fetch products');
+        }
+
+        return data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+/**
+ * Create a new Razorpay order
+ * @param {number} productId - Product ID
+ * @returns {Promise<Object>} Order data
+ */
+export const createOrder = async (productId) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/payments/create-order/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ product_id: productId }),
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to create order');
+        }
+
+        return data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+/**
+ * Verify a Razorpay payment
+ * @param {Object} paymentData - Payment data from Razorpay
+ * @returns {Promise<Object>} Verification status
+ */
+export const verifyPayment = async (paymentData) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/payments/verify-payment/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(paymentData),
+            credentials: 'include',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Payment verification failed');
+        }
+
+        return data;
+    } catch (error) {
+        throw error;
+    }
+};

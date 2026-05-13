@@ -69,7 +69,7 @@ function ChatInterface({ user, chatId, onChatCreated, onNewChat }) {
             const data = await sendMessage(input, selectedModel, chatId);
             const assistantMessage = { role: 'assistant', content: data.response };
             setMessages(prev => [...prev, assistantMessage]);
-            
+
             // If this was a new chat, notify the parent to update selectedChatId
             if (!chatId && data.chat_id && onChatCreated) {
                 onChatCreated(data.chat_id);
@@ -93,24 +93,15 @@ function ChatInterface({ user, chatId, onChatCreated, onNewChat }) {
 
     return (
         <div className="chat-interface-wrapper">
-            <header className="chat-main-header">
-                <h1 className="page-title">AI Chat</h1>
-                <div className="header-actions">
-                    <button className="new-chat-btn" title="New Chat" onClick={() => setMessages([])}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <line x1="12" y1="5" x2="12" y2="19" />
-                            <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                    </button>
-                </div>
-            </header>
+
 
             <div className="chat-messages-container">
                 {messages.length === 0 ? (
-                    <div className="welcome-container">
-                        <div className="welcome-content">
-                            <h2 className="welcome-heading">Welcome to Learnup</h2>
-                            <p className="welcome-subtext">How can I help you today? Type a message below to start chatting.</p>
+                    <div className="chat-welcome-container">
+                        <div className="chat-welcome-content">
+                            <h2 className="chat-welcome-heading">Welcome to Learnup</h2>
+                            <p className="chat-welcome-subtext">How can I help you today?</p>
+                            <p className="chat-welcome-subtext">Type a message below to start chatting.</p>
                         </div>
                     </div>
                 ) : (
@@ -182,8 +173,8 @@ function ChatInterface({ user, chatId, onChatCreated, onNewChat }) {
                             onKeyDown={handleKeyDown}
                             rows="1"
                         />
-                        <button 
-                            type="submit" 
+                        <button
+                            type="submit"
                             className="send-button"
                             disabled={!input.trim() || isLoading}
                         >
@@ -193,13 +184,13 @@ function ChatInterface({ user, chatId, onChatCreated, onNewChat }) {
                             </svg>
                         </button>
                     </div>
-                    
+
                     <div className="input-actions-row">
                         <div className="left-actions">
                             <div className="model-selector-inline no-border">
                                 <span className="model-label">Model:</span>
-                                <select 
-                                    value={selectedModel} 
+                                <select
+                                    value={selectedModel}
                                     onChange={(e) => setSelectedModel(e.target.value)}
                                     disabled={isLoading}
                                     className="inline-model-select"

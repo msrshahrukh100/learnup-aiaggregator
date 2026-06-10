@@ -3,6 +3,41 @@
 const API_BASE_URL = 'http://localhost:8000';
 
 /**
+ * Helper to get cookie value by name
+ * @param {string} name - Cookie name
+ * @returns {string|null} Cookie value
+ */
+const getCookie = (name) => {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+};
+
+/**
+ * Helper to get default headers for POST requests
+ * @returns {Object} Headers including CSRF token
+ */
+const getPostHeaders = () => {
+    const headers = {
+        'Content-Type': 'application/json',
+    };
+    const csrfToken = getCookie('csrftoken');
+    if (csrfToken) {
+        headers['X-CSRFToken'] = csrfToken;
+    }
+    return headers;
+};
+
+/**
  * Signup a new user
  * @param {string} email - User's email address
  * @param {string} password - User's password
@@ -12,9 +47,7 @@ export const signup = async (email, password) => {
     try {
         const response = await fetch(`${API_BASE_URL}/users/signup/`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getPostHeaders(),
             body: JSON.stringify({ email, password }),
             credentials: 'include', // Include cookies for session management
         });
@@ -41,9 +74,7 @@ export const login = async (email, password) => {
     try {
         const response = await fetch(`${API_BASE_URL}/users/login/`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getPostHeaders(),
             body: JSON.stringify({ email, password }),
             credentials: 'include', // Include cookies for session management
         });
@@ -91,6 +122,7 @@ export const logout = async () => {
     try {
         const response = await fetch(`${API_BASE_URL}/users/logout/`, {
             method: 'POST',
+            headers: getPostHeaders(),
             credentials: 'include',
         });
 
@@ -140,9 +172,7 @@ export const sendMessage = async (message, modelName, chatId = null) => {
     try {
         const response = await fetch(`${API_BASE_URL}/api/chat/`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getPostHeaders(),
             body: JSON.stringify({ message, model_name: modelName, chat_id: chatId }),
             credentials: 'include',
         });
@@ -241,9 +271,7 @@ export const createOrder = async (productId) => {
     try {
         const response = await fetch(`${API_BASE_URL}/api/payments/create-order/`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getPostHeaders(),
             body: JSON.stringify({ product_id: productId }),
             credentials: 'include',
         });
@@ -269,9 +297,7 @@ export const verifyPayment = async (paymentData) => {
     try {
         const response = await fetch(`${API_BASE_URL}/api/payments/verify-payment/`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getPostHeaders(),
             body: JSON.stringify(paymentData),
             credentials: 'include',
         });

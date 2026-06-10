@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from .utils import (
     parse_json_request,
@@ -13,7 +13,6 @@ from .utils import (
 )
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def signup(request):
     """
@@ -69,7 +68,8 @@ def signup(request):
         return error_response(f'An error occurred: {str(e)}')
 
 
-@csrf_exempt
+
+@ensure_csrf_cookie
 @require_http_methods(["GET"])
 def me(request):
     """
@@ -84,7 +84,6 @@ def me(request):
         return error_response('Not authenticated', status=401)
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def logout(request):
     """
@@ -97,7 +96,6 @@ def logout(request):
     })
 
 
-@csrf_exempt
 @require_http_methods(["POST"])
 def login(request):
     """

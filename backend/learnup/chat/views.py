@@ -7,7 +7,6 @@ from django.db import transaction
 from .models import Chat, ChatMessage, UserTokenBalance, UserTokenTransaction
 from .llmprovider.factory import LLMFactory
 
-@csrf_exempt
 @require_POST
 def chat_view(request):
     """
@@ -97,7 +96,6 @@ def chat_view(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-@csrf_exempt
 @require_GET
 def get_models_view(request):
     """

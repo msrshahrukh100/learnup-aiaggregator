@@ -25,12 +25,12 @@ load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(!y@ow5^f_zo(h$e#yn187_e&%o%52yqdkkz1((fhw)7-!02fc'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-(!y@ow5^f_zo(h$e#yn187_e&%o%52yqdkkz1((fhw)7-!02fc')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['learnupofficial.com', 'www.learnupofficial.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -125,11 +125,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'https://learnupofficial.com',
+    'https://www.learnupofficial.com',
 ]
 
 # Allow credentials (cookies, authorization headers, etc.)
@@ -139,6 +142,8 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'https://learnupofficial.com',
+    'https://www.learnupofficial.com',
 ]
 
 # CSRF Cookie Settings

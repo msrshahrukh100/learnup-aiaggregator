@@ -68,6 +68,7 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 ```
 
+
 ### 2. Frontend Prep
 
 We want to avoid hardcoding `localhost:8000` in production. Update your API service to use a dynamic backend URL.
